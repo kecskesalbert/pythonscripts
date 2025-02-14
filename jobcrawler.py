@@ -1,4 +1,4 @@
-# /usr/bin/env python
+#!/usr/bin/env python3
 
 import requests
 from requests.exceptions import MissingSchema
@@ -7,13 +7,37 @@ import json
 
 import sys
 
+# TODO: Non-blocking HTTP I/O:
+# https://dev.to/sagnew/asynchronous-http-requests-in-python-with-httpx-and-asyncio-2n19
+# https://stackoverflow.com/questions/67713274/python-asyncio-httpx
+# https://requests.readthedocs.io/en/latest/user/advanced/#blocking-or-non-blocking
+# https://www.zenrows.com/blog/python-parallel-requests
+# https://towardsdev.com/multithreaded-http-requests-in-python-453f07db98e1
+# https://stackoverflow.com/questions/9110593/asynchronous-requests-with-python-requests
+# http://web.archive.org/web/20071001004937/http://members.verizon.net/olsongt/stackless/why_stackless.html#why-stackless
+
+
+# TODO: headless browser
+# https://www.browsercat.com/pricing: SaaS, 1000 requests/month for free
+# https://steel.dev: Saas: 100 hours/month for free, or self-hosted free
+# https://headlessbrowsers.com
+
+
+# TODO: Location (city name and/or postcode) to coordinates lookup
+# https://developers.google.com/maps/documentation/javascript/places#find_place_from_query
+# https://postcodes.io
+# https://www.data.gov.uk/dataset/5e4ef2be-ad87-4c56-ba23-dbcbc874c6c1/os-places-api
+# https://towns.online-tech.co.uk
+
+# TODO: Distance calculation between coordinates
+
 
 def printtag(tag, depth=0):
     print(
         "  " * depth,
         tag.name,
-        type(tag), 
-        str(len(tag.attrs)) + ' attrs,' if hasattr(tag, 'attrs') else '', 
+        type(tag),
+        str(len(tag.attrs)) + ' attrs,' if hasattr(tag, 'attrs') else '',
         str(len(tag.contents)) + ' children' if hasattr(tag, 'contents') else '',
         repr(str(tag)[:20].strip())
     )
@@ -23,7 +47,7 @@ def printtag(tag, depth=0):
     if hasattr(tag, 'contents'):
         for child in tag.contents:
             printtag(child, depth+1)
-    
+
 class parser_stub:
     def __init__(self):
         pass
@@ -50,7 +74,7 @@ class parser_speechmatics:
                         'link:', job['absolute_url'],
                     )
 
-class parser_darktrace:
+class parser_greenhouse:
     def __init__(self):
         pass
     def parse(self, html, params=None):
@@ -63,17 +87,13 @@ class parser_darktrace:
                     continue
                 location_tag = job.find(name='span', attrs = {'class': 'location'})
                 if location_tag is None:
-                    continue                
+                    continue
                 print('Found:', link_tag.contents[0],
                     'at:', location_tag.contents[0],
                     'in department:', department_name,
                     'link:', link_tag['href'],
                 )
 
-# In: 
-# url: page URL as string
-# request_args: request arguments as dict
-# parser_class: classname of parser
 def fetchpage(url, request_args, parser_class):
     ret = {'html': None}
     parts = url.split('://',2)
@@ -93,14 +113,6 @@ def fetchpage(url, request_args, parser_class):
             # Raise HTTPError for http errors
             fetch_response.raise_for_status()
 
-# Non-blocking :
-# https://dev.to/sagnew/asynchronous-http-requests-in-python-with-httpx-and-asyncio-2n19
-# https://stackoverflow.com/questions/67713274/python-asyncio-httpx
-# https://requests.readthedocs.io/en/latest/user/advanced/#blocking-or-non-blocking
-# https://www.zenrows.com/blog/python-parallel-requests
-# https://towardsdev.com/multithreaded-http-requests-in-python-453f07db98e1
-# https://stackoverflow.com/questions/9110593/asynchronous-requests-with-python-requests
-# http://web.archive.org/web/20071001004937/http://members.verizon.net/olsongt/stackless/why_stackless.html#why-stackless
 
     # .url
     # .headers: headers
@@ -110,21 +122,41 @@ def fetchpage(url, request_args, parser_class):
 
             ret['html'] = fetch_response.text
         except requests.exceptions.RequestException as err:
-            return({'err': err})        
+            return({'err': err})
 
     parser = parser_class()
     ret = parser.parse(ret['html'])
     return(ret)
 
 
-# if __name__ == "__main__":
+def main():
+    crawl_list = [
+    ('https://boards.eu.greenhouse.io/darktracelimited', None, parser_greenhouse),
+    ('https://boards.greenhouse.io/graphcore', None, parser_greenhouse),
+    ('https://www.speechmatics.com/company/careers/roles', None, parser_speechmatics),
+    ]
 
-for params in [
-    ('https://boards.eu.greenhouse.io/darktracelimited',None,parser_darktrace),
-    ('https://www.speechmatics.com/company/careers/roles', { 'timeout': (5,2) }, parser_speechmatics),
-    
-    ]:
-    resp = fetchpage(params[0],params[1],params[2])
-    # print(resp)
+    for params in crawl_list:
+        resp = fetchpage(params[0],params[1],params[2])
+        # print(resp)
 
+
+
+# modified GH
+#('https://job-boards.eu.greenhouse.io/renaissance', None, parser_greenhouse),
+#('https://job-boards.eu.greenhouse.io/plos', None, parser_greenhouse),
+
+# Custom template
+# https://www.red-gate.com/our-company/careers/current-opportunities/
+
+# ARM
+# curl.exe -H "content-type: application/json; charset=utf-8" "https://careers.arm.com/search-jobs/results?ActiveFacetID=2635167&CurrentPage=1&RecordsPerPage=15&TotalContentResults=&Distance=50&RadiusUnitType=0&Keywords=&Location=&ShowRadius=False&IsPagination=False&CustomFacetName=&FacetTerm=&FacetType=0&FacetFilters%5B0%5D.ID=2635167&FacetFilters%5B0%5D.FacetType=2&FacetFilters%5B0%5D.Count=158&FacetFilters%5B0%5D.Display=United+Kingdom&FacetFilters%5B0%5D.IsApplied=true&FacetFilters%5B0%5D.FieldName=&SearchResultsModuleName=Search+Results&SearchFiltersModuleName=Search+Filters&SortCriteria=0&SortDirection=0&SearchType=5&PostalCode=&ResultsType=0&fc=&fl=&fcf=&afc=&afl=&afcf=&TotalContentPages=NaN"
+
+# Workday (need headless browser)
+# google-chrome-stable --headless --dump-dom --virtual-time-budget=30000 https://sec.wd3.myworkdayjobs.com/Samsung_Careers?locations=490fb96c8f12100dcd6b4d958d150000
+
+
+
+if __name__ == "__main__":
+    main()
 
