@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import requests
 from requests.exceptions import MissingSchema
@@ -88,10 +88,10 @@ class parser_greenhouse:
                 location_tag = job.find(name='span', attrs = {'class': 'location'})
                 if location_tag is None:
                     continue
-                print('Found:', link_tag.contents[0],
-                    'at:', location_tag.contents[0],
-                    'in department:', department_name,
-                    'link:', link_tag['href'],
+                print('Found:', repr(link_tag.contents[0]),
+                    'at:', repr(location_tag.contents[0]),
+                    'in department:', repr(department_name),
+                    'link:', repr(link_tag['href']),
                 )
 
 def fetchpage(url, request_args, parser_class):
@@ -156,7 +156,8 @@ def main():
 # google-chrome-stable --headless --dump-dom --virtual-time-budget=30000 https://sec.wd3.myworkdayjobs.com/Samsung_Careers?locations=490fb96c8f12100dcd6b4d958d150000
 
 
-
 if __name__ == "__main__":
+    # This is required utf-8 for printing utf8 to stdout, probably on Windows only
+    sys.stdout.reconfigure(encoding='utf-8')
     main()
 
