@@ -60,7 +60,6 @@ async def runtest():
             f = open(f"out-page-{page_number}.html", "w", encoding='utf-8')
             f.write(html)
             f.close()
-            # await page.screenshot(path='playwright_test.png', full_page=True);
 
             # Exit the loop when we have the last item
             if (int(footer_match.groups()[1]) >= int(footer_match.groups()[2])):
@@ -74,4 +73,3 @@ async def runtest():
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding='utf-8')
     asyncio.run(runtest())
-

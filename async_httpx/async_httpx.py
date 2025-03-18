@@ -14,7 +14,6 @@ from bs4 import BeautifulSoup, SoupStrainer
 import lxml
 import re
 import sys
-#from urllib.parse import urljoin
 from urllib import parse
 
 async def http_get(httpx_client, url, **kvargs):
@@ -28,7 +27,6 @@ async def http_get(httpx_client, url, **kvargs):
             print("Timeout occured, retrying", file=sys.stderr)
     print("RCV", str(resp.url)[:75], resp.status_code, flush=True, file=sys.stderr)
     return resp
-
 
 async def fetchpage(base_url='https://www.cambridgenetwork.co.uk/companies/search-results'):
     async with httpx.AsyncClient() as httpx_client:

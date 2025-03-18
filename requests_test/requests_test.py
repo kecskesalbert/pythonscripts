@@ -4,33 +4,7 @@ import requests
 from requests.exceptions import MissingSchema
 from bs4 import BeautifulSoup, SoupStrainer
 import json
-
 import sys
-
-# TODO: Non-blocking HTTP I/O:
-# https://dev.to/sagnew/asynchronous-http-requests-in-python-with-httpx-and-asyncio-2n19
-# https://stackoverflow.com/questions/67713274/python-asyncio-httpx
-# https://requests.readthedocs.io/en/latest/user/advanced/#blocking-or-non-blocking
-# https://www.zenrows.com/blog/python-parallel-requests
-# https://towardsdev.com/multithreaded-http-requests-in-python-453f07db98e1
-# https://stackoverflow.com/questions/9110593/asynchronous-requests-with-python-requests
-# http://web.archive.org/web/20071001004937/http://members.verizon.net/olsongt/stackless/why_stackless.html#why-stackless
-
-
-# TODO: headless browser
-# https://www.browsercat.com/pricing: SaaS, 1000 requests/month for free
-# https://steel.dev: Saas: 100 hours/month for free, or self-hosted free
-# https://headlessbrowsers.com
-
-
-# TODO: Location (city name and/or postcode) to coordinates lookup
-# https://developers.google.com/maps/documentation/javascript/places#find_place_from_query
-# https://postcodes.io
-# https://www.data.gov.uk/dataset/5e4ef2be-ad87-4c56-ba23-dbcbc874c6c1/os-places-api
-# https://towns.online-tech.co.uk
-
-# TODO: Distance calculation between coordinates
-
 
 def printtag(tag, depth=0):
     print(
@@ -113,13 +87,6 @@ def fetchpage(url, request_args, parser_class):
             # Raise HTTPError for http errors
             fetch_response.raise_for_status()
 
-
-    # .url
-    # .headers: headers
-    # .content: content as bytes
-    # .text:    content as string
-    # .json():  content as json
-
             ret['html'] = fetch_response.text
         except requests.exceptions.RequestException as err:
             return({'err': err})
@@ -127,7 +94,6 @@ def fetchpage(url, request_args, parser_class):
     parser = parser_class()
     ret = parser.parse(ret['html'])
     return(ret)
-
 
 def main():
     crawl_list = [
@@ -140,24 +106,7 @@ def main():
         resp = fetchpage(params[0],params[1],params[2])
         # print(resp)
 
-
-
-# modified GH
-#('https://job-boards.eu.greenhouse.io/renaissance', None, parser_greenhouse),
-#('https://job-boards.eu.greenhouse.io/plos', None, parser_greenhouse),
-
-# Custom template
-# https://www.red-gate.com/our-company/careers/current-opportunities/
-
-# ARM
-# curl.exe -H "content-type: application/json; charset=utf-8" "https://careers.arm.com/search-jobs/results?ActiveFacetID=2635167&CurrentPage=1&RecordsPerPage=15&TotalContentResults=&Distance=50&RadiusUnitType=0&Keywords=&Location=&ShowRadius=False&IsPagination=False&CustomFacetName=&FacetTerm=&FacetType=0&FacetFilters%5B0%5D.ID=2635167&FacetFilters%5B0%5D.FacetType=2&FacetFilters%5B0%5D.Count=158&FacetFilters%5B0%5D.Display=United+Kingdom&FacetFilters%5B0%5D.IsApplied=true&FacetFilters%5B0%5D.FieldName=&SearchResultsModuleName=Search+Results&SearchFiltersModuleName=Search+Filters&SortCriteria=0&SortDirection=0&SearchType=5&PostalCode=&ResultsType=0&fc=&fl=&fcf=&afc=&afl=&afcf=&TotalContentPages=NaN"
-
-# Workday (need headless browser)
-# google-chrome-stable --headless --dump-dom --virtual-time-budget=30000 https://sec.wd3.myworkdayjobs.com/Samsung_Careers?locations=490fb96c8f12100dcd6b4d958d150000
-
-
 if __name__ == "__main__":
     # This is required utf-8 for printing utf8 to stdout, probably on Windows only
     sys.stdout.reconfigure(encoding='utf-8')
     main()
-
