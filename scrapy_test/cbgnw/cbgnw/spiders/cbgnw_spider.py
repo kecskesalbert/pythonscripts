@@ -32,10 +32,6 @@ class MySpider(scrapy.Spider):
         for companyitem in selector.xpath("//div[@class='views-row']/div[contains(@class, 'views-field-display-name-1')]/*[name()!='p']/a"):
             company_name = re.sub(r'\W+','', companyitem.xpath('string()').get())
             company_url = companyitem.xpath('@href').get()
-            logger.debug("Raw: %s", str(companyitem))
-            logger.debug("Name: %s", str(companyitem.xpath('string()').get()))
-            logger.debug("SanitName: %s", str(company_name))
-            logger.debug("Link: %s", str(company_url));
 
             # Click on the company link
             yield response.follow(
@@ -50,9 +46,9 @@ class MySpider(scrapy.Spider):
 
         # Go to next page
         for next_page in selector.xpath("//li[contains(@class, 'pager__item--next')]"):
-            logger.debug("NP: %s", next_page)
+            nplink = next_page.xpath('./*[1]').xpath('@href').get()
             yield response.follow(
-                next_page,
+                nplink,
                 self.parse,
                 cb_kwargs={
                     "main_url": parse.urljoin(main_url, company_url)
@@ -63,8 +59,6 @@ class MySpider(scrapy.Spider):
     # Company showcase page
     def parse2(self, response, main_url, company_name):
         logger = logging.getLogger(__name__)
-        logger.debug("P2 for %s: %s", company_name, main_url)
-        # logger.debug("HTML: %s", response.xpath('.').get())
         found = dict(
             name=company_name,
             address="",
@@ -73,9 +67,7 @@ class MySpider(scrapy.Spider):
         )
         for detail in response.selector.xpath("//div[contains(@class, 'article-aside')]//div[contains(@class, 'views-row')]"):
             childcount = int(float(detail.xpath("count(./*)").get()))
-            # logger.debug("Detail: %d %s", childcount, detail)
             if (childcount == 5):
-                #logger.debug("Address: %s", detail.xpath(".").get())
                 addrpiece = []
                 for piece in detail.xpath("./*"):
                     ptext = piece.xpath('string()').get()
