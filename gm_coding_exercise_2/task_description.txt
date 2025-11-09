@@ -1,0 +1,21 @@
+Sparse vector compression
+
+A sparse n-dimension vector has a majority of zero elements.
+
+Example:
+
+  [3, 8, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 7, 8, 0, 0, 0, 0, 0]
+
+Tasks:
+
+    - Define a data structure, SparseVector, for representing a compressed sparse vector efficiently.
+	- Write a function, dot_product(self, other) to perform a dot product between two compressed sparse vectors using your data structure from 1.
+
+    Ensure that the underlying data structure chosen is the most optimal in terms of both operation cost and memory usage.
+
+Example of dot product for uncompressed vectors:
+
+vector1 = [8, 0, 0, 0, 0, 4, 0, 3],
+vector2 = [0, 0, 0, 1, 6, 1, 0, 15]
+
+DotProduct = 8*0 + 0*0 + 0*0 + 0*1 + 0*6 + 4*1 + 0*0 + 3*15 = 49

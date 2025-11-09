@@ -1,0 +1,5 @@
+- Install Python
+- Install ffmpeg
+- Add binaries to PATH
+- Start command prompt in the flac directory
+- chcp 1252
